@@ -29,8 +29,8 @@ export abstract class Enemy extends Entity {
     this.type = config.type;
     this.points = config.megaCycle > 1 ? 90 : config.points;
     this.baseSpeed = config.speed;
-    this.speed = config.speed * (1 + (config.megaCycle - 1) * 0.15);
-    this.fireRate = config.fireRate * Math.pow(0.9, config.megaCycle - 1);
+    this.speed = config.speed * (1 + (config.megaCycle - 1) * 0.08);
+    this.fireRate = config.fireRate * Math.pow(0.95, config.megaCycle - 1);
     this.megaCycle = config.megaCycle;
     this.initialX = x;
     this.initialY = y;
