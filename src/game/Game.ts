@@ -565,14 +565,14 @@ export class Game {
     if (blink) {
       ctx.fillStyle = '#FFFFFF';
       ctx.font = '20px monospace';
-      ctx.fillText('PRESS SPACE TO START', CONFIG.GAME_WIDTH / 2, 420);
+      ctx.fillText('TAP OR PRESS SPACE TO START', CONFIG.GAME_WIDTH / 2, 420);
     }
 
     // Controls
     ctx.fillStyle = '#888888';
     ctx.font = '12px monospace';
-    ctx.fillText('ARROW KEYS / A D - MOVE', CONFIG.GAME_WIDTH / 2, 500);
-    ctx.fillText('SPACE / Z - FIRE', CONFIG.GAME_WIDTH / 2, 520);
+    ctx.fillText('KEYBOARD: ARROWS/AD - MOVE | SPACE/Z - FIRE', CONFIG.GAME_WIDTH / 2, 500);
+    ctx.fillText('TOUCH: TAP LEFT/RIGHT - MOVE | TAP - FIRE', CONFIG.GAME_WIDTH / 2, 520);
     ctx.fillText('P / ESC - PAUSE', CONFIG.GAME_WIDTH / 2, 540);
   }
 
@@ -644,7 +644,7 @@ export class Game {
     if (blink) {
       ctx.fillStyle = '#FFFFFF';
       ctx.font = '16px monospace';
-      ctx.fillText('PRESS SPACE TO PLAY AGAIN', CONFIG.GAME_WIDTH / 2, CONFIG.GAME_HEIGHT / 2 + 100);
+      ctx.fillText('TAP OR PRESS SPACE TO PLAY AGAIN', CONFIG.GAME_WIDTH / 2, CONFIG.GAME_HEIGHT / 2 + 100);
     }
   }
 
@@ -674,7 +674,7 @@ export class Game {
     if (blink) {
       ctx.fillStyle = '#FFFFFF';
       ctx.font = '16px monospace';
-      ctx.fillText('PRESS SPACE TO PLAY AGAIN', CONFIG.GAME_WIDTH / 2, CONFIG.GAME_HEIGHT / 2 + 100);
+      ctx.fillText('TAP OR PRESS SPACE TO PLAY AGAIN', CONFIG.GAME_WIDTH / 2, CONFIG.GAME_HEIGHT / 2 + 100);
     }
   }
 }
