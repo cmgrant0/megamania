@@ -1,6 +1,7 @@
 import { Entity } from './Entity';
 import { CONFIG, EnemyType } from '../game/Config';
 import { EnemyBullet } from './Bullet';
+import { settings } from '../systems/SettingsManager';
 
 export interface EnemyConfig {
   type: EnemyType;
@@ -28,9 +29,15 @@ export abstract class Enemy extends Entity {
     super(x, y, width, height);
     this.type = config.type;
     this.points = config.megaCycle > 1 ? 90 : config.points;
-    this.baseSpeed = config.speed;
-    this.speed = config.speed * (1 + (config.megaCycle - 1) * 0.08);
-    this.fireRate = config.fireRate * Math.pow(0.95, config.megaCycle - 1);
+
+    // Apply difficulty modifiers
+    const diffMod = settings.difficultyModifier;
+    const baseSpeed = config.speed * diffMod.speedMult;
+    const baseFireRate = config.fireRate * diffMod.fireRateMult;
+
+    this.baseSpeed = baseSpeed;
+    this.speed = baseSpeed * (1 + (config.megaCycle - 1) * 0.08);
+    this.fireRate = baseFireRate * Math.pow(0.95, config.megaCycle - 1);
     this.megaCycle = config.megaCycle;
     this.initialX = x;
     this.initialY = y;

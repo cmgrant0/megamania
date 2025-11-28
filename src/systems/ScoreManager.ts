@@ -82,6 +82,15 @@ export class ScoreManager {
     return this._score === this._highScore && this._score > 0;
   }
 
+  clearHighScore(): void {
+    this._highScore = 0;
+    try {
+      localStorage.removeItem(HIGH_SCORE_KEY);
+    } catch {
+      // localStorage not available
+    }
+  }
+
   private loadHighScore(): void {
     try {
       const saved = localStorage.getItem(HIGH_SCORE_KEY);
