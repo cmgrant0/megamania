@@ -94,37 +94,83 @@ export class Player extends Entity {
       ctx.globalAlpha = 0.3;
     }
 
-    // Draw ship body (Star Trek inspired design)
-    ctx.fillStyle = CONFIG.COLORS.PLAYER;
+    // Draw ship body (Megamania-style horizontal spacecraft)
+    const cx = this.centerX;
+    const baseY = this.y + 6;
 
-    // Main hull (saucer section)
+    // Main fuselage - horizontal elongated body
+    ctx.fillStyle = CONFIG.COLORS.PLAYER;
+    ctx.fillRect(cx - 14, baseY + 4, 28, 8);
+
+    // Nose cone (front/top of ship)
     ctx.beginPath();
-    ctx.ellipse(this.centerX, this.y + 8, 16, 6, 0, 0, Math.PI * 2);
+    ctx.moveTo(cx - 14, baseY + 4);
+    ctx.lineTo(cx, baseY - 2);
+    ctx.lineTo(cx + 14, baseY + 4);
+    ctx.closePath();
     ctx.fill();
 
-    // Engineering section
-    ctx.fillRect(this.centerX - 4, this.y + 8, 8, 12);
+    // Cockpit canopy
+    ctx.fillStyle = '#66DDFF';
+    ctx.beginPath();
+    ctx.moveTo(cx - 6, baseY + 4);
+    ctx.lineTo(cx, baseY);
+    ctx.lineTo(cx + 6, baseY + 4);
+    ctx.closePath();
+    ctx.fill();
 
-    // Nacelles (engine pods)
+    // Cockpit highlight
+    ctx.fillStyle = '#AAFFFF';
+    ctx.beginPath();
+    ctx.moveTo(cx - 3, baseY + 3);
+    ctx.lineTo(cx, baseY + 1);
+    ctx.lineTo(cx + 3, baseY + 3);
+    ctx.closePath();
+    ctx.fill();
+
+    // Left wing
     ctx.fillStyle = CONFIG.COLORS.PLAYER_ACCENT;
-    ctx.fillRect(this.x + 2, this.y + 6, 6, 14);
-    ctx.fillRect(this.x + this.width - 8, this.y + 6, 6, 14);
+    ctx.beginPath();
+    ctx.moveTo(cx - 14, baseY + 6);
+    ctx.lineTo(cx - 20, baseY + 14);
+    ctx.lineTo(cx - 14, baseY + 12);
+    ctx.closePath();
+    ctx.fill();
 
-    // Thruster flames
-    const flameHeight = 4 + this.thrusterFrame * 2;
+    // Right wing
+    ctx.beginPath();
+    ctx.moveTo(cx + 14, baseY + 6);
+    ctx.lineTo(cx + 20, baseY + 14);
+    ctx.lineTo(cx + 14, baseY + 12);
+    ctx.closePath();
+    ctx.fill();
+
+    // Engine exhausts on main body
+    ctx.fillStyle = CONFIG.COLORS.PLAYER;
+    ctx.fillRect(cx - 10, baseY + 12, 6, 4);
+    ctx.fillRect(cx + 4, baseY + 12, 6, 4);
+
+    // Thruster flames (animated)
+    const flameHeight = 3 + this.thrusterFrame * 2;
     ctx.fillStyle = '#FF6600';
-    ctx.fillRect(this.x + 3, this.y + this.height - 2, 4, flameHeight);
-    ctx.fillRect(this.x + this.width - 7, this.y + this.height - 2, 4, flameHeight);
+    ctx.fillRect(cx - 9, baseY + 16, 4, flameHeight);
+    ctx.fillRect(cx + 5, baseY + 16, 4, flameHeight);
     ctx.fillStyle = '#FFFF00';
-    ctx.fillRect(this.x + 4, this.y + this.height - 2, 2, flameHeight - 2);
-    ctx.fillRect(this.x + this.width - 6, this.y + this.height - 2, 2, flameHeight - 2);
+    ctx.fillRect(cx - 8, baseY + 16, 2, flameHeight - 1);
+    ctx.fillRect(cx + 6, baseY + 16, 2, flameHeight - 1);
+
+    // Wing tip lights
+    ctx.fillStyle = '#FF0000';
+    ctx.fillRect(cx - 19, baseY + 12, 2, 2);
+    ctx.fillStyle = '#00FF00';
+    ctx.fillRect(cx + 17, baseY + 12, 2, 2);
 
     // Shield effect
     if (this.hasShield) {
       ctx.strokeStyle = '#00FFFF';
       ctx.lineWidth = 2;
       ctx.beginPath();
-      ctx.ellipse(this.centerX, this.centerY, this.width / 2 + 6, this.height / 2 + 6, 0, 0, Math.PI * 2);
+      ctx.ellipse(cx, baseY + 8, this.width / 2 + 4, this.height / 2 + 2, 0, 0, Math.PI * 2);
       ctx.stroke();
       ctx.lineWidth = 1;
     }
