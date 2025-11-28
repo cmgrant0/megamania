@@ -568,7 +568,7 @@ export class BowTie extends Enemy {
 
 // Wave 8: Space Dice - Falling patterns, 45° in later cycles
 export class SpaceDice extends Enemy {
-  private angle: number = Math.PI / 2; // Straight down by default
+  private angle: number = Math.PI; // Straight down
   private faceValue: number;
 
   constructor(x: number, y: number, config: Omit<EnemyConfig, 'type' | 'points' | 'speed' | 'fireRate'>) {
@@ -579,9 +579,9 @@ export class SpaceDice extends Enemy {
     });
     this.faceValue = Math.floor(Math.random() * 6) + 1;
 
-    // 45° angle in later megacycles
+    // 45° diagonal angles in later megacycles (down-right or down-left)
     if (config.megaCycle > 1) {
-      this.angle = Math.random() < 0.5 ? Math.PI / 4 : (3 * Math.PI) / 4;
+      this.angle = Math.random() < 0.5 ? (3 * Math.PI) / 4 : (5 * Math.PI) / 4;
     }
   }
 
@@ -597,9 +597,9 @@ export class SpaceDice extends Enemy {
     this.x += movement.dx * deltaTime;
     this.y += movement.dy * deltaTime;
 
-    // Bounce off side walls
+    // Bounce off side walls (reverse horizontal direction)
     if (this.x <= 0 || this.x + this.width >= CONFIG.GAME_WIDTH) {
-      this.angle = Math.PI - this.angle;
+      this.angle = -this.angle;
     }
 
     super.update(deltaTime);
