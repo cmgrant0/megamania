@@ -123,30 +123,91 @@ export class Hamburger extends Enemy {
   }
 
   render(ctx: CanvasRenderingContext2D): void {
-    // Top bun
-    ctx.fillStyle = '#D4A24C';
+    const wobble = Math.sin(this.time * 8) * 1;
+    const cx = this.centerX;
+    const cy = this.y + wobble;
+
+    // Shadow under burger
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
     ctx.beginPath();
-    ctx.ellipse(this.centerX, this.y + 5, 14, 5, 0, Math.PI, 0);
+    ctx.ellipse(cx, cy + 20, 12, 3, 0, 0, Math.PI * 2);
     ctx.fill();
-
-    // Sesame seeds
-    ctx.fillStyle = '#FFFFCC';
-    ctx.fillRect(this.centerX - 6, this.y + 2, 3, 2);
-    ctx.fillRect(this.centerX + 3, this.y + 2, 3, 2);
-
-    // Lettuce
-    ctx.fillStyle = '#44CC44';
-    ctx.fillRect(this.x + 2, this.y + 7, this.width - 4, 3);
-
-    // Patty
-    ctx.fillStyle = '#8B4513';
-    ctx.fillRect(this.x + 3, this.y + 10, this.width - 6, 5);
 
     // Bottom bun
+    ctx.fillStyle = '#C4943C';
+    ctx.beginPath();
+    ctx.ellipse(cx, cy + 16, 13, 4, 0, 0, Math.PI);
+    ctx.fill();
+    ctx.fillStyle = '#D4A24C';
+    ctx.fillRect(cx - 13, cy + 14, 26, 3);
+
+    // Juicy patty with grill marks
+    ctx.fillStyle = '#6B3310';
+    ctx.fillRect(cx - 12, cy + 9, 24, 5);
+    ctx.fillStyle = '#4A2208';
+    ctx.fillRect(cx - 8, cy + 10, 2, 3);
+    ctx.fillRect(cx - 2, cy + 10, 2, 3);
+    ctx.fillRect(cx + 4, cy + 10, 2, 3);
+
+    // Melted cheese dripping over edges
+    ctx.fillStyle = '#FFD700';
+    ctx.fillRect(cx - 11, cy + 7, 22, 3);
+    // Cheese drips
+    ctx.beginPath();
+    ctx.moveTo(cx - 10, cy + 10);
+    ctx.lineTo(cx - 12, cy + 14);
+    ctx.lineTo(cx - 8, cy + 10);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(cx + 8, cy + 10);
+    ctx.lineTo(cx + 11, cy + 13);
+    ctx.lineTo(cx + 10, cy + 10);
+    ctx.fill();
+
+    // Wavy lettuce
+    ctx.fillStyle = '#32CD32';
+    ctx.beginPath();
+    ctx.moveTo(cx - 13, cy + 7);
+    for (let i = 0; i < 6; i++) {
+      ctx.quadraticCurveTo(
+        cx - 11 + i * 4.5, cy + 4 + (i % 2) * 3,
+        cx - 9 + i * 4.5, cy + 7
+      );
+    }
+    ctx.lineTo(cx + 13, cy + 9);
+    ctx.lineTo(cx - 13, cy + 9);
+    ctx.closePath();
+    ctx.fill();
+
+    // Tomato slice peeking out
+    ctx.fillStyle = '#FF4444';
+    ctx.beginPath();
+    ctx.ellipse(cx - 6, cy + 6, 4, 2, -0.3, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#FF6666';
+    ctx.beginPath();
+    ctx.ellipse(cx - 6, cy + 5.5, 2, 1, -0.3, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Top bun with dome shape
     ctx.fillStyle = '#D4A24C';
     ctx.beginPath();
-    ctx.ellipse(this.centerX, this.y + 17, 14, 4, 0, 0, Math.PI);
+    ctx.ellipse(cx, cy + 4, 13, 6, 0, Math.PI, 0);
     ctx.fill();
+    // Bun highlight
+    ctx.fillStyle = '#E8BC6C';
+    ctx.beginPath();
+    ctx.ellipse(cx, cy + 2, 8, 3, 0, Math.PI, 0);
+    ctx.fill();
+
+    // Sesame seeds scattered on top
+    ctx.fillStyle = '#FFFDE8';
+    const seeds = [[-7, 2], [-3, 0], [1, 1], [5, 0], [8, 2], [-1, 3], [4, 3]];
+    seeds.forEach(([sx, sy]) => {
+      ctx.beginPath();
+      ctx.ellipse(cx + sx, cy + sy, 1.5, 1, Math.random() * 0.5, 0, Math.PI * 2);
+      ctx.fill();
+    });
   }
 }
 
@@ -187,22 +248,88 @@ export class Cookie extends Enemy {
   }
 
   render(ctx: CanvasRenderingContext2D): void {
-    // Cookie base
+    const cx = this.centerX;
+    const cy = this.centerY;
+    const pulse = 1 + Math.sin(this.time * 6) * 0.03;
+
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.scale(pulse, pulse);
+
+    // Cookie base with irregular edge
     ctx.fillStyle = '#D2691E';
     ctx.beginPath();
-    ctx.arc(this.centerX, this.centerY, 11, 0, Math.PI * 2);
+    for (let i = 0; i < 12; i++) {
+      const angle = (i / 12) * Math.PI * 2;
+      const radius = 11 + Math.sin(i * 2.5) * 1.5;
+      if (i === 0) {
+        ctx.moveTo(Math.cos(angle) * radius, Math.sin(angle) * radius);
+      } else {
+        ctx.lineTo(Math.cos(angle) * radius, Math.sin(angle) * radius);
+      }
+    }
+    ctx.closePath();
     ctx.fill();
 
-    // Chocolate chips
-    ctx.fillStyle = '#4A2C2A';
-    const chipPositions = [
-      [-4, -4], [3, -2], [-2, 4], [5, 3], [-5, 1]
-    ];
-    chipPositions.forEach(([ox, oy]) => {
+    // Bite taken out (top right)
+    ctx.fillStyle = '#000011'; // Background color
+    ctx.beginPath();
+    ctx.arc(9, -7, 5, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Golden baked edge highlight
+    ctx.strokeStyle = '#E8A050';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(0, 0, 10, Math.PI * 0.3, Math.PI * 1.2);
+    ctx.stroke();
+
+    // Cookie texture - small darker spots
+    ctx.fillStyle = '#B8611A';
+    const textureSpots = [[-6, -3], [2, -6], [-3, 5], [6, 2], [-7, 3], [0, -2]];
+    textureSpots.forEach(([tx, ty]) => {
       ctx.beginPath();
-      ctx.arc(this.centerX + ox, this.centerY + oy, 2, 0, Math.PI * 2);
+      ctx.arc(tx, ty, 1, 0, Math.PI * 2);
       ctx.fill();
     });
+
+    // Chocolate chips - chunky and shiny
+    const chips = [
+      [-4, -3, 2.5], [4, -4, 2], [-2, 4, 2.5], [5, 3, 2], [-6, 1, 2], [1, 1, 2.5], [-4, -7, 1.5]
+    ];
+    chips.forEach(([ox, oy, size]) => {
+      // Skip chips near the bite
+      if (ox > 5 && oy < -3) return;
+
+      // Chip shadow
+      ctx.fillStyle = '#2A1810';
+      ctx.beginPath();
+      ctx.ellipse(ox + 0.5, oy + 0.5, size, size * 0.8, 0.3, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Chip body
+      ctx.fillStyle = '#3D2518';
+      ctx.beginPath();
+      ctx.ellipse(ox, oy, size, size * 0.8, 0.3, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Chip shine
+      ctx.fillStyle = '#5A3D2E';
+      ctx.beginPath();
+      ctx.arc(ox - size * 0.3, oy - size * 0.3, size * 0.4, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    // Crumbs near bite
+    ctx.fillStyle = '#D2691E';
+    ctx.beginPath();
+    ctx.arc(7, -10, 1, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(11, -4, 0.8, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
   }
 }
 
