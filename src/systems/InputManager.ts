@@ -12,6 +12,7 @@ export class InputManager {
   private touchLeft: boolean = false;
   private touchRight: boolean = false;
   private touchFire: boolean = false;
+  private previousTouchFire: boolean = false;
 
   constructor() {
     this.setupKeyboard();
@@ -76,6 +77,7 @@ export class InputManager {
 
   update(): void {
     this.previousKeys = new Set(this.keys);
+    this.previousTouchFire = this.touchFire;
   }
 
   getState(): InputState {
@@ -84,8 +86,12 @@ export class InputManager {
       right: this.keys.has('ArrowRight') || this.keys.has('KeyD') || this.touchRight,
       fire: this.keys.has('Space') || this.keys.has('KeyZ') || this.touchFire,
       pause: this.isJustPressed('KeyP') || this.isJustPressed('Escape'),
-      start: this.isJustPressed('Space') || this.isJustPressed('Enter'),
+      start: this.isJustPressed('Space') || this.isJustPressed('Enter') || this.isTouchJustPressed(),
     };
+  }
+
+  private isTouchJustPressed(): boolean {
+    return this.touchFire && !this.previousTouchFire;
   }
 
   private isJustPressed(code: string): boolean {
