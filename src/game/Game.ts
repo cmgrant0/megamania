@@ -10,6 +10,8 @@ import { ScoreManager } from '../systems/ScoreManager';
 import { WaveManager } from '../waves/WaveManager';
 import { ParticleSystem } from '../rendering/ParticleSystem';
 import { Starfield } from '../rendering/Starfield';
+import { SettingsOverlay } from '../ui/SettingsOverlay';
+import { settings } from '../systems/SettingsManager';
 
 export class Game {
   private canvas: HTMLCanvasElement;
@@ -20,6 +22,7 @@ export class Game {
   private waveManager: WaveManager;
   private particles: ParticleSystem;
   private starfield: Starfield;
+  private settingsOverlay: SettingsOverlay;
 
   private state: GameState = GameState.TITLE;
   private player: Player;
@@ -27,7 +30,7 @@ export class Game {
   private enemyBullets: EnemyBullet[] = [];
   private powerUps: PowerUp[] = [];
 
-  private lives: number = CONFIG.PLAYER.STARTING_LIVES;
+  private lives: number = settings.startingLives;
   private energy: number = CONFIG.ENERGY.MAX;
   private energyWarningPlayed: boolean = false;
 
@@ -53,8 +56,18 @@ export class Game {
     this.particles = new ParticleSystem();
     this.starfield = new Starfield();
     this.player = new Player();
+    this.settingsOverlay = new SettingsOverlay();
+
+    // Connect settings overlay to audio and score managers
+    this.settingsOverlay.setAudioManager(this.audio);
+    this.settingsOverlay.setScoreManager(this.score);
+
+    // Apply initial settings
+    this.audio.setVolume(settings.effectiveVolume);
 
     this.setupCanvas();
+    this.setupSettingsButton();
+    this.setupOverlayEvents();
     window.addEventListener('resize', () => this.setupCanvas());
   }
 
@@ -71,6 +84,57 @@ export class Game {
     this.canvas.height = CONFIG.GAME_HEIGHT;
     this.canvas.style.width = `${CONFIG.GAME_WIDTH * scale}px`;
     this.canvas.style.height = `${CONFIG.GAME_HEIGHT * scale}px`;
+
+    // Update overlay scale for click handling
+    this.settingsOverlay.updateScale(this.canvas);
+  }
+
+  private setupSettingsButton(): void {
+    const btn = document.getElementById('settings-btn');
+    if (btn) {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.settingsOverlay.toggle();
+        // Pause game when opening settings during play
+        if (this.settingsOverlay.visible && this.state === GameState.PLAYING) {
+          this.state = GameState.PAUSED;
+        }
+      });
+    }
+  }
+
+  private setupOverlayEvents(): void {
+    // Handle clicks on the canvas for the settings overlay
+    this.canvas.addEventListener('click', (e) => {
+      if (this.settingsOverlay.visible) {
+        this.settingsOverlay.handleClick(e.clientX, e.clientY, this.canvas);
+      }
+    });
+
+    // Handle mouse drag for sliders
+    this.canvas.addEventListener('mousedown', (e) => {
+      if (this.settingsOverlay.visible) {
+        this.settingsOverlay.handleMouseDown(e.clientX, e.clientY, this.canvas);
+      }
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      this.settingsOverlay.handleMouseMove(e.clientX, e.clientY, this.canvas);
+    });
+
+    window.addEventListener('mouseup', () => {
+      this.settingsOverlay.handleMouseUp();
+    });
+
+    // Touch support for settings overlay
+    this.canvas.addEventListener('touchstart', (e) => {
+      if (this.settingsOverlay.visible && e.touches.length > 0) {
+        const touch = e.touches[0];
+        if (this.settingsOverlay.handleClick(touch.clientX, touch.clientY, this.canvas)) {
+          e.preventDefault();
+        }
+      }
+    }, { passive: false });
   }
 
   start(): void {
@@ -90,6 +154,12 @@ export class Game {
   }
 
   private update(deltaTime: number): void {
+    // Block game input when settings overlay is open
+    if (this.settingsOverlay.visible) {
+      this.starfield.update(deltaTime);
+      return;
+    }
+
     const inputState = this.input.getState();
 
     // Update starfield always
@@ -388,7 +458,7 @@ export class Game {
     this.enemyBullets = [];
     this.powerUps = [];
     this.particles.clear();
-    this.lives = CONFIG.PLAYER.STARTING_LIVES;
+    this.lives = settings.startingLives;
     this.energy = CONFIG.ENERGY.MAX;
     this.energyWarningPlayed = false;
     this.waveManager.spawnWave();
@@ -442,6 +512,9 @@ export class Game {
         this.renderVictory();
         break;
     }
+
+    // Render settings overlay on top of everything
+    this.settingsOverlay.render(ctx);
 
     ctx.restore();
   }

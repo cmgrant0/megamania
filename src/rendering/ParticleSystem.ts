@@ -1,3 +1,5 @@
+import { settings } from '../systems/SettingsManager';
+
 interface Particle {
   x: number;
   y: number;
@@ -13,8 +15,11 @@ export class ParticleSystem {
   private particles: Particle[] = [];
 
   createExplosion(x: number, y: number, color: string, count: number = 12): void {
-    for (let i = 0; i < count; i++) {
-      const angle = (i / count) * Math.PI * 2 + Math.random() * 0.5;
+    const adjustedCount = Math.round(count * settings.particleMultiplier);
+    if (adjustedCount === 0) return;
+
+    for (let i = 0; i < adjustedCount; i++) {
+      const angle = (i / adjustedCount) * Math.PI * 2 + Math.random() * 0.5;
       const speed = 100 + Math.random() * 150;
       this.particles.push({
         x,
@@ -44,8 +49,11 @@ export class ParticleSystem {
   }
 
   createPowerUpCollect(x: number, y: number, color: string): void {
-    for (let i = 0; i < 8; i++) {
-      const angle = (i / 8) * Math.PI * 2;
+    const count = Math.round(8 * settings.particleMultiplier);
+    if (count === 0) return;
+
+    for (let i = 0; i < count; i++) {
+      const angle = (i / count) * Math.PI * 2;
       const speed = 80;
       this.particles.push({
         x,
